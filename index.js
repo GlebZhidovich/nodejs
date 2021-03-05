@@ -16,8 +16,22 @@ function logging(request) {
     console.log("Тип запроса: " + request.method);
 }
 
-function listenServer(request, response){
+async function getBody(request) {
+    return new Promise((resolve) => {
+        let body = [];
+        request
+            .on('data', (chunk) => {
+                body.push(chunk);
+            })
+            .on('end', () => {
+                resolve(Buffer.concat(body).toString());
+            });
+    });
+}
+
+async function listenServer(request, response) {
     logging(request);
-    const id = nanoid();
-    response.end("Hello world! " + id);
+    const body = await getBody(request);
+    console.log(JSON.parse(body))
+    response.end("Hello world! ");
 }
