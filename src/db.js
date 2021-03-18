@@ -22,9 +22,18 @@ const update = (id, user) => {
   return hasProject;
 }
 
+const remove = (id) => {
+  const hasProject = projects.has(id);
+  if (hasProject) {
+    projects.delete(id);
+  }
+  return hasProject;
+}
+
 module.exports = {
   create,
   getAll,
   getById,
-  update
+  update,
+  remove
 }

@@ -23,21 +23,13 @@ const router = {
   }),
   getMethodId: errorHandleWrap(async ({ res, id }) => {
     const project = projectService.getById(id);
-    if (project) {
-      responseWithData({res, data: project, code: 200});
-      return;
-    }
-    sendNotFound(res);
+    project ? responseWithData({res, data: project, code: 200}) : sendNotFound(res);
   }),
   putMethodId: errorHandleWrap(async ({ res, id, body }) => {
-    if (isProject(body) && projectService.update(id, body)) {
-      res.end('update');
-      return;
-    }
-    sendNotFound(res);
+    isProject(body) && projectService.update(id, body) ? res.end('update') : sendNotFound(res);
   }),
-  deleteMethodId: errorHandleWrap(async ({ res, id, body }) => {
-
+  deleteMethodId: errorHandleWrap(async ({ res, id }) => {
+    projectService.remove(id) ? res.end('delete') : sendNotFound(res);
   })
 }
 
