@@ -19,25 +19,26 @@ const router = {
   getMethod: errorHandleWrap(async ({ res }) => {
     const projectsMap = projectService.getAll();
     const projects = fromMapToArray(projectsMap);
-    const code = 200;
-    responseWithData({ res, data: projects, code })
+    responseWithData({ res, data: projects, code: 200 })
   }),
   getMethodId: errorHandleWrap(async ({ res, id }) => {
     const project = projectService.getById(id);
     if (project) {
-      const code = 200;
-      responseWithData({res, data: project, code});
+      responseWithData({res, data: project, code: 200});
       return;
     }
     sendNotFound(res);
   }),
-  // deleteMethodId: errorHandleWrap(async ({ res }) => {
-  //   const projectsMap = projectService.getAll();
-  //   const projects = fromMapToArray(projectsMap);
-  //   res.statusCode = 201;
-  //   res.setHeader('Content-Type', 'application/json');
-  //   res.end(JSON.stringify(projects));
-  // }),
+  putMethodId: errorHandleWrap(async ({ res, id, body }) => {
+    if (isProject(body) && projectService.update(id, body)) {
+      res.end('update');
+      return;
+    }
+    sendNotFound(res);
+  }),
+  deleteMethodId: errorHandleWrap(async ({ res, id, body }) => {
+
+  })
 }
 
 module.exports = router;

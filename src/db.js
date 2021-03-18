@@ -13,8 +13,18 @@ const getById = (id) => {
   return projects.get(id);
 }
 
+const update = (id, user) => {
+  const hasProject = projects.has(id);
+  if (hasProject) {
+    projects.delete(id);
+    projects.set(id, user);
+  }
+  return hasProject;
+}
+
 module.exports = {
   create,
   getAll,
-  getById
+  getById,
+  update
 }
