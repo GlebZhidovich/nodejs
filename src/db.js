@@ -2,9 +2,14 @@ const projects = new Map();
 
 const create = (user) => {
   projects.set(user.id, user);
-  return 'User create';
+  return user;
+}
+
+const getAll = () => {
+  return projects;
 }
 
 module.exports = {
-  create
+  create,
+  getAll
 }

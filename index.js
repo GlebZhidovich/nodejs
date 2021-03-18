@@ -1,5 +1,6 @@
 const http = require('http');
-const router = require('./src/projects.router')
+const router = require('./src/projects.router');
+const { sendNotFound, sendInternal } = require('./src/error');
 const { getBody } = require('./src/helpers');
 
 process.on('uncaughtException', err => {
@@ -17,7 +18,7 @@ http.createServer(listenServer).listen(3000, '127.0.0.1', () => {
 function logging({ url, method, body }) {
   console.log('Url: ' + url);
   console.log('Тип запроса: ' + method);
-  console.log('Body: ' + body);
+  console.log('Body: ' + JSON.stringify(body, null, 2));
 }
 
 function isProductsUrl(url) {
@@ -37,15 +38,20 @@ function isAccess(url, method) {
 }
 
 async function listenServer(req, res) {
-  const { url, method } = req;
-  const body = await getBody(req);
-  logging({ url, method, body });
-    console.log(isProductsUrl(url))
-  if (isAccess(url, method)) {
-    router[`${method.toLowerCase()}Method`](req, res);
-    return;
-  }
+  try {
+    const { url, method } = req;
+    const bodyJson = await getBody(req);
+    const body = JSON.parse(bodyJson);
+    logging({ url, method, body });
 
-  res.statusCode = 404;
-  res.end('Not found!');
+    if (isAccess(url, method)) {
+      router[`${method.toLowerCase()}Method`]({ req, res, body });
+      return;
+    }
+
+    sendNotFound(res);
+  } catch (err) {
+    console.error(err);
+    sendInternal(res);
+  }
 }
