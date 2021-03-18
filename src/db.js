@@ -9,7 +9,12 @@ const getAll = () => {
   return projects;
 }
 
+const getById = (id) => {
+  return projects.get(id);
+}
+
 module.exports = {
   create,
-  getAll
+  getAll,
+  getById
 }
