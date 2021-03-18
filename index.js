@@ -1,7 +1,7 @@
 const http = require('http');
 const router = require('./src/projects.router');
 const { sendNotFound, sendInternal } = require('./src/error');
-const { getBody } = require('./src/helpers');
+const { getBody, getProjectId, isAccess, getRouterMethodName } = require('./src/helpers');
 
 process.on('uncaughtException', err => {
   console.error('Uncaught Exception:', err.message);
@@ -21,31 +21,15 @@ function logging({ url, method, body }) {
   console.log('Body: ' + JSON.stringify(body, null, 2));
 }
 
-function isProductsUrl(url) {
-  const urlName = 'projects';
-  const arrUrl = url.split('/');
-  const maxParams = 4;
-  return arrUrl.includes(urlName) && arrUrl.length < maxParams;
-}
-
-function isInRouter(method) {
-  const methodName = `${method.toLowerCase()}Method`;
-  return router[methodName];
-}
-
-function isAccess(url, method) {
-  return isProductsUrl(url) && isInRouter(method);
-}
-
 async function listenServer(req, res) {
   try {
     const { url, method } = req;
+    const id = getProjectId(url);
     const bodyJson = await getBody(req);
     const body = JSON.parse(bodyJson);
     logging({ url, method, body });
-
-    if (isAccess(url, method)) {
-      router[`${method.toLowerCase()}Method`]({ req, res, body });
+    if (isAccess({ url, method, obj: router })) {
+      router[getRouterMethodName({ method, id })]({ req, res, body, id });
       return;
     }
 
